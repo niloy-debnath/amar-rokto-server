@@ -24,7 +24,7 @@ app.get("/", (req, res) => {
   res.send("Amar Rokto server is running!");
 });
 
-// Get donors API
+// Get all donors
 app.get("/donors", async (req, res) => {
   try {
     const allDonors = await Donor.find();
@@ -34,7 +34,7 @@ app.get("/donors", async (req, res) => {
   }
 });
 
-// GET donor by ID
+// Get donor by ID
 app.get("/donors/:id", async (req, res) => {
   try {
     const donor = await Donor.findById(req.params.id);
@@ -46,7 +46,7 @@ app.get("/donors/:id", async (req, res) => {
   }
 });
 
-// CREATE a new donor
+// Create a new donor
 app.post("/donors", async (req, res) => {
   try {
     const donor = new Donor(req.body);
@@ -54,6 +54,24 @@ app.post("/donors", async (req, res) => {
     res.status(201).json({ success: true, donor });
   } catch (error) {
     res.status(400).json({ success: false, error });
+  }
+});
+
+// UPDATE donor by ID
+app.patch("/donors/:id", async (req, res) => {
+  try {
+    const updatedDonor = await Donor.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { new: true, runValidators: true } // return updated doc
+    );
+
+    if (!updatedDonor)
+      return res.status(404).json({ message: "Donor not found" });
+
+    res.status(200).json(updatedDonor);
+  } catch (error) {
+    res.status(500).json({ message: "Failed to update donor", error });
   }
 });
 
